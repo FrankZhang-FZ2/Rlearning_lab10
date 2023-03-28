@@ -1,7 +1,7 @@
 ---
 title: "Lab 10 - Grading the professor, Pt. 2"
-author: "Insert your name here"
-date: "Insert date here"
+author: "Qilin Zhang"
+date: "3/28/23"
 output: github_document
 ---
 
@@ -11,17 +11,137 @@ output: github_document
 library(tidyverse) 
 library(tidymodels)
 library(openintro)
+library(psych)
+library(infer)
 ```
 
 ### Exercise 1
 
-Remove this text, and add your answer for Exercise 1 here.
-Add code chunks as needed.
-Don't forget to label your code chunk.
-Do not use spaces in code chunk labels.
+y = 0.06664*x + 3.88034
+R2 = 0.03502
+Adj. R2 = 0.03293
 
-### Exercise 2
+```{r beauty_score}
+evals <- evals
 
-...
+m_bty <- lm(
+  score ~ bty_avg,
+  data = evals
+)
+summary(m_bty)
+```
+
+
+### Exercise 2 - 9
+
+#2
+y = 0.07416*x1 + 0.17239X2 + 3.74734 
+x1= bty_avg
+x2 = gender
+R2 = 0.05912
+Adj. R2 = 0.05503
+#3
+When we hold beauty score constant, male score higher on average than female by 0.17239.
+When we hold gender constant, every 1 point increase in beauty score is associated with 0.07416 in eval scores. 
+#4
+About 5.9% of variability in eval scores is explained by m-bty-gen. 
+#5
+y = 0.07416*x1 + 3.91973
+#6
+Male tend to have higher rating when scored the same in beauty scores 
+#7
+From the previous model, it seems like intercept is the only thing that changes when shifting from male to female
+#8
+The adjusted r2 increase by around 2% after adding gender as an additional predictor. It shows that gender add some predictability above and beyond beauty scores. 
+#9
+It seems like introducing gender does shift the parameter estimate for beauty score (from 0.06664 to 0.07416).
+```{r beauty_gen_score}
+m_bty_gen <- lm(
+  score ~ bty_avg + gender,
+  data = evals
+)
+summary(m_bty_gen)
+```
+###exercise 10
+
+Y = 0.06783x1 + 3.98155 - 0.1607 x2 - 0.12623 x3
+x1 = bty_avg
+x2 = tenure track or not
+x3 = tenured
+When we hold beauty score constant, shifting in rank associates with change in eval scores as well. Especially, tenure track professor tend to have 0.1607 less than teaching professors and tenured tend to have 0.12623 less than teaching professors. 
+#R2 seems to show only weak to no impact from rank. 
+```{r beauty_rank}
+m_bty_rank <- lm(
+  score ~ bty_avg + rank,
+  data = evals
+)
+summary(m_bty_rank)
+```
+
+###exercise 11+12
+
+I think language might be unrelated to eval scores unless there is bias against that. Also, the number of evaluation in class should have little predictability for eval scores. 
+
+```{r worstmodel}
+# language
+m_language <- lm(
+  score ~ language,
+  data = evals
+)
+summary(m_language)
+
+#cls_did_eval
+m_eval <- lm(
+  score ~ cls_did_eval,
+  data = evals
+)
+summary(m_eval)
+```
+
+###exercise 13 +14
+I will not include cls_perc_eval because it is essentially the same thing as cls_did_eval
+
+```{r complex model}
+m_complex <- lm(
+  score ~
+    rank +
+    ethnicity +
+    gender + 
+    language +
+    age +
+    cls_did_eval + 
+    cls_students + 
+    cls_level + 
+    cls_profs +
+    cls_credits +
+    bty_avg,
+  data = evals
+)
+summary(m_complex)
+```
+###exercise 15 + 16
+
+#16
+When holding all other variables constant, one point increase in age is associate with 0.005222 point decrease in eval score. 
+When holding all other variables constant, shifting from male to female is associated with 0.186761 decrease in eval score. 
+#17
+Seem like professors that are male, younger, and with relatively high beauty score in classes with one credit, less students, and lower students who submit course eval will have higer eval scores.
+#18
+I would not be comfortable generalizing my findings to professors all over the world considering the low sample size and the homogenity of the sample size (they are all from the same univeristy I assume). 
+```{r bestmodel}
+m_best <- lm(
+  score ~
+    ethnicity +
+    gender + 
+    language +
+    age +
+    cls_did_eval + 
+    cls_students + 
+    cls_credits +
+    bty_avg,
+  data = evals
+)
+summary(m_best)
+```
 
 Add exercise headings as needed.
